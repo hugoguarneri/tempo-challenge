@@ -1,0 +1,39 @@
+server:
+  port: ${$PORT:8080}
+  error:
+    include-stacktrace: never
+    include-message: always
+spring:
+  cloud:
+    openfeign:
+      client:
+        config:
+          randomNumberClient.url: ${RANDOM_NUMBER_API_URL:localhost:3000}
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+  cache:
+    cache-names: randomNumberCache
+    caffeine:
+      spec: maximumSize=100,expireAfterWrite=60s
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${POSTGRES_DB_HOST:localhost}:${POSTGRES_DB_PORT:5432}/${POSTGRES_DB_NAME:tenpo}
+    username: ${POSTGRES_DB_USER:root}
+    password: ${POSTGRES_DB_PASSWORD:root}
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: false
+    generate-ddl: true
+    hibernate:
+      ddl-auto: ${DDL_AUTO:create-drop}
+    properties:
+      hibernate:
+        format_sql: true
+      org:
+        hibernate:
+          envers:
+            default_schema: public
+
+
+
+

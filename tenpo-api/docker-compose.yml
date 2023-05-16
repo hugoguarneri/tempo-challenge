@@ -1,0 +1,22 @@
+version: '3'
+
+networks:
+  tenpo-network:
+
+volumes:
+  db_data:
+
+services:
+  tenpo-db:
+    container_name: tenpo-db
+    image: postgres:13-alpine
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_DB=tenpo
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - tenpo-network

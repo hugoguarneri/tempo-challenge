@@ -1,0 +1,56 @@
+version: '3'
+
+networks:
+  tenpo-network:
+
+volumes:
+  db_data:
+
+services:
+  tenpo-db:
+    container_name: tenpo-db
+    image: postgres:13-alpine
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_DB=tenpo
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - tenpo-network
+  random-number-api:
+    container_name: random-number-api
+    build:
+      context: ./random-number-api
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    environment:
+      - PORT=3000
+    networks:
+      - tenpo-network
+  tenpo-api:
+    container_name: tenpo-api
+    build:
+      context: ./tenpo-api
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    environment:
+      - PORT=8080
+      - RANDOM_NUMBER_API_URL=random-number-api:3000
+      - POSTGRES_DB_HOST=tenpo-db
+      - POSTGRES_DB_PORT=5432
+      - POSTGRES_DB_NAME=tenpo
+      - POSTGRES_DB_USER=root
+      - POSTGRES_DB_PASSWORD=root
+    networks:
+      - tenpo-network
+    depends_on:
+      - tenpo-db
+      - random-number-api
+
+#docker-compose up -d --build
+#docker-compose down --rmi all -v
