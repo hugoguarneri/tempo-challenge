@@ -1,20 +1,18 @@
 const express = require('express');
 
 const PORT = process.env.PORT ?? 3000;
+const ERROR_RATE = process.env.ERROR_RATE ?? 25;
 
 const app = express();
 
 app.get('/api/number', (request, response) => {
-  const randomNumber = Math.floor(Math.random() * 110) + 1;
+  const shouldReturnError = Math.random() < ERROR_RATE / 100;
+  const randomNumber = Math.floor(Math.random() * 100) + 1;
 
-  if (randomNumber <= 100) {
-    response
-      .status(200)
-      .json({ value: randomNumber });
+  if (shouldReturnError) {
+    response.status(500).json({ code: 500, status: 'Internal Server Error' });
   } else {
-    response
-      .status(500)
-      .json({ code: 500, status: 'Internal Server Error' });
+    response.status(200).json({ value: randomNumber });
   }
 });
 

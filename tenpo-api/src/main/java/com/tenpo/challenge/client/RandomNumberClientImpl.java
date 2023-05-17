@@ -18,7 +18,7 @@ public class RandomNumberClientImpl {
     }
 
     @Retryable(maxAttempts = 3, backoff = @Backoff(delay = 1000))
-    @Cacheable(value = "randomNumberCache", key = "'randomNumber'")
+    @Cacheable(cacheManager = "cacheManager", value = "randomNumberCache", key = "'randomNumber'")
     public RandomNumberDto getRandomNumber() {
         return randomNumberClient.getRandomNumber();
     }
