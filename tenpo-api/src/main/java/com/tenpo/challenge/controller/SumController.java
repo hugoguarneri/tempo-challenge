@@ -10,34 +10,36 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping("api/sum")
 public class SumController {
 
     private final SumService sumService;
-    private final Bucket bucket;
+    private final Bucket rateLimiter;
 
     @Autowired
-    public SumController(SumService sumService, Bucket bucket) {
+    public SumController(SumService sumService, Bucket rateLimiter) {
         this.sumService = sumService;
-        this.bucket = bucket;
+        this.rateLimiter = rateLimiter;
     }
 
-    @GetMapping("/sum")
+    @GetMapping("")
     private ResponseEntity<SumDto> sum(
             @RequestParam(value = "number_one", required = true) Double numberOne,
             @RequestParam(value = "number_two", required = true) Double numberTwo
     ) {
-        if(!bucket.tryConsume(1)) {
+        if(!rateLimiter.tryConsume(1)) {
             throw new RateLimitException();
         }
         SumDto result = sumService.calculate(numberOne, numberTwo);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @GetMapping("/sum/history")
+    @GetMapping("/history")
     private ResponseEntity<Page<SumDto>> history(
             Pageable pageable
     ) {
